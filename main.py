@@ -242,17 +242,17 @@ class MyWin(QtWidgets.QMainWindow):
 
     def get_text(self):
         comment1 = 'Подключите ПКУ к ПК через RS-232. Подключите питание к ПКУ (напряжение питания - 3,3 В). Для ' \
-                   'продолжения настройки нажмите "Continue" '
+                   'продолжения настройки нажмите "Continue".'
         comment2 = 'Проверьте читсоту коннеторов. Подключите вход ОУ к выходу аттенюатора IQS-3150, выход ОУ - ко ' \
                    'входу измерителя мощности IQS-1700 (предварительно произведите калибровку входного сигнала). ' \
                    'Установоите входную мощность -6 дБм. Для проверки мощности нажмите лазера накачки, подключите ' \
                    'выходной коннектор лазера к измерителю ВЫСОКОЙ мощности IQS-1700. Для продолжения настройки ' \
-                   'нажмите "Continue" '
+                   'нажмите "Continue".'
         comment3 = 'Проверьте читсоту коннеторов. Подключите вход ОУ к выходу аттенюатора IQS-3150, выход ОУ - ко ' \
                    'входу измерителя мощности IQS-1700 (предварительно произведите калибровку входного сигнала). ' \
                    'Соедените плату лазера и ПКУ. Подключите питание к ПКУ (напряжение питания - 3,3 В). Установоите ' \
-                   'входную мощность -6 дБм. Для продолжения настройки нажмите "Continue"'
-        comment4 = 'Подключите питание к ОУ (напряжение питания - 3,3 В). Для продолжения настройки нажмите "Continue"'
+                   'входную мощность -6 дБм. Для продолжения настройки нажмите "Continue".'
+        comment4 = 'Подключите питание к ОУ (напряжение питания - 3,3 В). Для продолжения настройки нажмите "Continue".'
         if self.checked_radiobutton() and self.ui.radioButton_5.isChecked():
             if self.ui.radioButton.isChecked():
                 self.ui.plainTextEdit_2.clear()
@@ -606,6 +606,7 @@ class FirstWindow(QtWidgets.QWidget):
                 self.config.dacsp_corr(float(self.modal.lineEdit_5.text()))
                 self.file_status('saved successfully', f'File __Config_Write_{int(self.modal.lineEdit.text())}.txt')
                 auto_upload(f'__Config_Write_{int(self.modal.lineEdit.text())}.txt')
+                auto_upload('AM_OFF.txt')
                 zoc_min()
                 self.complete_mes()
                 self.modal.pushButton_6.setVisible(False)
@@ -721,7 +722,8 @@ class SecondWindow(QtWidgets.QWidget):
     def report(self):
         if check_process('zoc') is not None:
             self.set_status(2)
-            auto_upload('__report.txt', 'yes')
+            auto_log()
+            auto_upload('__report.txt')
             zoc_min()
             if read_temp():
                 self.set_status(2)
@@ -782,11 +784,13 @@ class SecondWindow(QtWidgets.QWidget):
                     auto_upload('AM_CURRENT.txt')
                     if acc == 'op':
                         auto_upload(f'ACC 1 {self.config.get_config_value("EOL")}.txt')
+                        auto_upload('_LCLC_1.txt')
                         zoc_min()
                         self.modal.lineEdit_5.setReadOnly(False)
                         self.set_status(1)
                     else:
                         auto_upload(f'ACC 1 {self.config.get_config_value("SCC_HT")}.txt')
+                        auto_upload('_LCLC_1.txt')
                         zoc_min()
                         self.modal.lineEdit_6.setReadOnly(False)
                         self.set_status(1)
@@ -812,7 +816,7 @@ class SecondWindow(QtWidgets.QWidget):
                     else:
                         return False
                 elif self.modal.radioButton_5.isChecked():
-                    if 4.5 < float(self.modal.lineEdit_4.text()[1:]) <= 5.25:
+                    if 4.3 < float(self.modal.lineEdit_4.text()[1:]) <= 5.25:
                         return True
                     else:
                         return False
@@ -823,7 +827,7 @@ class SecondWindow(QtWidgets.QWidget):
                     else:
                         return False
                 elif self.modal.radioButton_5.isChecked():
-                    if 4.5 < float(self.modal.lineEdit_4.text()) <= 5.25:
+                    if 4.3 < float(self.modal.lineEdit_4.text()) <= 5.25:
                         return True
                     else:
                         return False
@@ -841,13 +845,16 @@ class SecondWindow(QtWidgets.QWidget):
         com.setStandardButtons(QtWidgets.QMessageBox.Ok)
         res = com.exec_()
         if res == QtWidgets.QMessageBox.Ok:
+            if self.modal.lineEdit_5.isReadOnly():
+                auto_upload('ACC 1 0.1.txt')
+                zoc_min()
             self.get_text()
         self.set_status(1)
 
     def check_for_op(self):
         if int(self.modal.plainTextEdit_3.toPlainText()[5:]) == 19:
             if self.modal.radioButton_6.isChecked():
-                if float(self.modal.lineEdit_5.text()) > 420:
+                if float(self.modal.lineEdit_5.text()) > 415:
                     if read_i_op():
                         if self.att_check():
                             self.complete_mes('')
@@ -1000,7 +1007,9 @@ class SecondWindow(QtWidgets.QWidget):
         self.modal.lineEdit_4.setStyleSheet(style2)
         self.modal.lineEdit_5.setStyleSheet(style2)
         self.modal.lineEdit_6.setStyleSheet(style2)
-        if self.modal.lineEdit_4.text().replace('.', '', 1).isdigit() or (self.modal.lineEdit_4.text().startswith('-') and self.modal.lineEdit_4.text()[1:].replace('.', '', 1).isdigit()):
+        if self.modal.lineEdit_4.text().replace('.', '', 1).isdigit() or (
+                self.modal.lineEdit_4.text().startswith('-') and self.modal.lineEdit_4.text()[1:].replace('.', '',
+                                                                                                          1).isdigit()):
             if self.modal.lineEdit_5.text() == '' and self.modal.lineEdit_6.text() == '':
                 if self.att_check():
                     self.modal.plainTextEdit_2.setPlainText('Комментарий:\n\nВносимое затухание соответствует'
@@ -2263,14 +2272,14 @@ class FourthWindow(QtWidgets.QWidget):
             self.set_status(1)
 
 
-logging_file = 'logfile1.txt'  # из главного экрана взять потом
+logging_file = 'ZOC_session_data.txt'
 
 
 def read_logfile():
     """Функция считывает содержимое
                 логфайла в список"""
     log_list = []
-    with open(fr'C:\Users\danil\OneDrive\Документы\ZOC7 Files\Log\логфайл\{logging_file}') as logFile:
+    with open(fr'C:\Users\danil\OneDrive\Документы\ZOC7 Files\Log\{logging_file}') as logFile:
         for row in logFile:
             log_list.append(row.split(' '))
         return log_list
@@ -2301,11 +2310,19 @@ def read_i_op():
             acc = float(sublist[2])
         if 'LASER1:' in sublist and 'mA\n' in sublist:
             iop_list.append(sublist[1])
-    if acc - 3 <= sum(map(lambda x: float(x), iop_list)) / len(iop_list) <= acc + 3 and len(
-            list(filter(lambda x: acc - 3 <= x <= acc + 3, map(lambda x: float(x), iop_list)))) == len(iop_list):
-        return True
+    if acc == 750.0:
+        if acc - 15 <= sum(map(lambda x: float(x), iop_list)) / len(iop_list) <= acc and len(
+                list(filter(lambda x: acc - 15 <= x <= acc + 5, map(lambda x: float(x), iop_list)))) == len(
+            iop_list):
+            return True
+        else:
+            return False
     else:
-        return False
+        if acc - 3 <= sum(map(lambda x: float(x), iop_list)) / len(iop_list) <= acc + 3 and len(
+                list(filter(lambda x: acc - 3 <= x <= acc + 3, map(lambda x: float(x), iop_list)))) == len(iop_list):
+            return True
+        else:
+            return False
 
 
 def read_i_eol():
@@ -2318,8 +2335,8 @@ def read_i_eol():
             acc = float(sublist[2])
         if 'LASER1:' in sublist and 'mA\n' in sublist:
             i_eol_list.append(sublist[1])
-    if acc - 10 <= sum(map(lambda x: float(x), i_eol_list)) / len(i_eol_list) <= acc and len(
-            list(filter(lambda x: acc - 10 <= x <= acc + 5, map(lambda x: float(x), i_eol_list)))) == len(i_eol_list):
+    if acc - 15 <= sum(map(lambda x: float(x), i_eol_list)) / len(i_eol_list) <= acc and len(
+            list(filter(lambda x: acc - 15 <= x <= acc + 5, map(lambda x: float(x), i_eol_list)))) == len(i_eol_list):
         return True
     else:
         return False
