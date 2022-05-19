@@ -2,12 +2,12 @@
 
 The program allows to automate the workflow. There is automatic connection to the ZOC Terminal. There is a modern design in the UI.
 
-##Libraries
+## Libraries
 
  - PyQt5
  - pywinauto
 
-##Screenshots
+## Screenshots
 Screenshots of the main and modal windows:
 
 ![alt text](screenshots/main.png "MainWindow")
