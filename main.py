@@ -783,13 +783,19 @@ class SecondWindow(QtWidgets.QWidget):
                     auto_log()
                     auto_upload('AM_CURRENT.txt')
                     if acc == 'op':
-                        auto_upload(f'ACC 1 {self.config.get_config_value("EOL")}.txt')
+                        if self.config.get_config_value("EOL") > 750:
+                            auto_upload(f'ACC 1 750.txt')
+                        else:
+                            auto_upload(f'ACC 1 {self.config.get_config_value("EOL")}.txt')
                         auto_upload('_LCLC_1.txt')
                         zoc_min()
                         self.modal.lineEdit_5.setReadOnly(False)
                         self.set_status(1)
                     else:
-                        auto_upload(f'ACC 1 {self.config.get_config_value("SCC_HT")}.txt')
+                        if self.config.get_config_value("SCC_HT") > 750:
+                            auto_upload(f'ACC 1 750.txt')
+                        else:
+                            auto_upload(f'ACC 1 {self.config.get_config_value("SCC_HT")}.txt')
                         auto_upload('_LCLC_1.txt')
                         zoc_min()
                         self.modal.lineEdit_6.setReadOnly(False)
@@ -816,7 +822,7 @@ class SecondWindow(QtWidgets.QWidget):
                     else:
                         return False
                 elif self.modal.radioButton_5.isChecked():
-                    if 4.3 < float(self.modal.lineEdit_4.text()[1:]) <= 5.25:
+                    if 4.2 < float(self.modal.lineEdit_4.text()[1:]) <= 5.25:
                         return True
                     else:
                         return False
@@ -827,7 +833,7 @@ class SecondWindow(QtWidgets.QWidget):
                     else:
                         return False
                 elif self.modal.radioButton_5.isChecked():
-                    if 4.3 < float(self.modal.lineEdit_4.text()) <= 5.25:
+                    if 4.2 < float(self.modal.lineEdit_4.text()) <= 5.25:
                         return True
                     else:
                         return False
@@ -1266,6 +1272,10 @@ class ThirdWindow(QtWidgets.QWidget):
                     if self.modal.lineEdit_7.text().isdigit():
                         self.config = LineAmplifierConfig(int(self.modal.lineEdit_7.text()))
                         self.config.tap_in_line = read_pdm1()
+                        # if -6.1 < read_pdm1() < -6:
+                        #     self.config.tap_in_line = read_pdm1()-0.2
+                        # else:
+                        #     self.config.tap_in_line = read_pdm1()
                         self.config.tap_out_line = float(self.modal.lineEdit_8.text())
                         self.config.write_config_file(
                             self.config.new_config_dict(TAP_IN_IL=self.config.tap_in_line_calc(),
@@ -1321,7 +1331,7 @@ class ThirdWindow(QtWidgets.QWidget):
             auto_upload('_PH.txt')
             zoc_min()
             if self.modal.plainTextEdit_3.toPlainText() == 'K25-M19':
-                if -6.11 <= read_pdm1() <= -5.97:
+                if -6.15 <= read_pdm1() <= -5.90:
                     self.set_status(2)
                     qst = QtWidgets.QMessageBox()
                     qst.setIcon(QtWidgets.QMessageBox.Question)
@@ -1361,7 +1371,7 @@ class ThirdWindow(QtWidgets.QWidget):
                     self.modal.plainTextEdit_2.setPlainText('Комментарий:\n\nЗначение входной мощности не равно -6 дБм')
                     self.set_status(1)
             else:
-                if -10.11 <= read_pdm1() <= -9.97:
+                if -10.15 <= read_pdm1() <= -9.90:
                     self.set_status(2)
                     qst = QtWidgets.QMessageBox()
                     qst.setIcon(QtWidgets.QMessageBox.Question)
@@ -1493,7 +1503,10 @@ class ThirdWindow(QtWidgets.QWidget):
                         self.config = PreAmplifierConfig(int(self.modal.lineEdit_7.text()))
                     if self.modal.lineEdit_10.isReadOnly():
                         self.acc_eol = self.config.get_config_value("EOL")
-                        auto_upload(f'ACC 1 {self.acc_eol}.txt')
+                        if self.acc_eol > 750:
+                            auto_upload(f'ACC 1 750.txt')
+                        else:
+                            auto_upload(f'ACC 1 {self.acc_eol}.txt')
                         self.modal.lineEdit_9.setFocus()
                         self.modal.lineEdit_9.setReadOnly(False)
                         self.modal.lineEdit_10.setReadOnly(False)
@@ -1505,7 +1518,10 @@ class ThirdWindow(QtWidgets.QWidget):
                                          f'File __Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
                     else:
                         self.acc_scc = self.config.get_config_value("SCC_HT")
-                        auto_upload(f'ACC 1 {self.acc_scc}.txt')
+                        if self.acc_scc > 750:
+                            auto_upload(f'ACC 1 750.txt')
+                        else:
+                            auto_upload(f'ACC 1 {self.acc_scc}.txt')
                         self.modal.lineEdit_10.setFocus()
                         self.set_status(1)
                         self.modal.plainTextEdit_2.setPlainText('Комментарий:\n\nВведите значение выходной '
@@ -1646,6 +1662,7 @@ class ThirdWindow(QtWidgets.QWidget):
                         self.file_status('changed successfully',
                                          f'File __Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
                         self.set_status(2)
+                        auto_upload(f'__Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
                         self.test_log()
                         auto_upload('AM_GAIN.txt')
                         auto_upload('_PHPHPH.txt')
@@ -1710,6 +1727,7 @@ class ThirdWindow(QtWidgets.QWidget):
                         self.file_status('changed successfully',
                                          f'File __Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
                         self.set_status(2)
+                        auto_upload(f'__Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
                         self.test_log()
                         auto_upload('AM_GAIN.txt')
                         auto_upload('_PHPHPH.txt')
@@ -1840,6 +1858,7 @@ class ThirdWindow(QtWidgets.QWidget):
         self.modal.label_10.setVisible(False)
         if check_process('zoc') is not None:
             self.set_status(2)
+            auto_upload(f'__Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
             auto_log()
             auto_upload('AM_Power.txt')
             auto_upload('APC_-2.txt')
@@ -1863,6 +1882,8 @@ class ThirdWindow(QtWidgets.QWidget):
                 com.setStandardButtons(QtWidgets.QMessageBox.Ok)
                 res = com.exec_()
                 if res == QtWidgets.QMessageBox.Ok:
+                    auto_upload('AM_GAIN.txt')
+                    zoc_min()
                     self.clear()
                     self.set_status(1)
             else:
@@ -1903,6 +1924,8 @@ class ThirdWindow(QtWidgets.QWidget):
                                                     B_PD_OUT='262413'))
                     self.file_status('changed successfully',
                                      f'File __Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    auto_upload(f'__Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    zoc_min()
                     self.get_text(6)
                 else:
                     self.config = PreAmplifierConfig(int(self.modal.lineEdit_7.text()))
@@ -1913,6 +1936,8 @@ class ThirdWindow(QtWidgets.QWidget):
                                                     B_PD_OUT='262413'))
                     self.file_status('changed successfully',
                                      f'File __Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    auto_upload(f'__Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    zoc_min()
                     self.get_text(10)
             except:
                 self.file_status('NOT changed', f'File __Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
@@ -2078,6 +2103,8 @@ class FourthWindow(QtWidgets.QWidget):
                         f'Комментарий:\n\nЗнчение параметра {self.modal.comboBox_2.currentText()} успешно изменено.')
                     self.file_status('changed successfully',
                                      f'File __Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    auto_upload(f'__Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    zoc_min()
                 else:
                     self.config = PreAmplifierConfig(int(self.modal.lineEdit_7.text()))
                     text = str(self.modal.comboBox_2.currentText())
@@ -2086,6 +2113,8 @@ class FourthWindow(QtWidgets.QWidget):
                         f'Комментарий:\n\nЗнчение параметра {self.modal.comboBox_2.currentText()} успешно изменено.')
                     self.file_status('changed successfully',
                                      f'File __Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    auto_upload(f'__Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    zoc_min()
             else:
                 self.modal.lineEdit_7.setStyleSheet(style1)
                 self.modal.plainTextEdit_2.setPlainText(
@@ -2192,6 +2221,8 @@ class FourthWindow(QtWidgets.QWidget):
                             DT=f'{date.today().day}.{f"{date.today().month:02d}"}.{str(date.today().year)[2:]}'))
                     self.file_status('changed successfully',
                                      f'File __Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    auto_upload(f'__Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    zoc_min()
                     self.modal.plainTextEdit_2.setPlainText(
                         'Комментарий:\n\nНажмите "Defaults" для продолжения настройки.')
                 else:
@@ -2201,6 +2232,8 @@ class FourthWindow(QtWidgets.QWidget):
                             DT=f'{date.today().day}.{f"{date.today().month:02d}"}.{str(date.today().year)[2:]}'))
                     self.file_status('changed successfully',
                                      f'File __Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    auto_upload(f'__Config_Write_{int(self.modal.lineEdit_7.text())}.txt')
+                    zoc_min()
                     self.modal.plainTextEdit_2.setPlainText(
                         'Комментарий:\n\nНажмите "Defaults" для продолжения настройки.')
             else:
@@ -2272,7 +2305,7 @@ class FourthWindow(QtWidgets.QWidget):
             self.set_status(1)
 
 
-logging_file = 'ZOC_session_data.txt'
+logging_file ='ZOC_session_data.txt'
 
 
 def read_logfile():
